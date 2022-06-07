@@ -88,7 +88,7 @@ class PostPagesTests(TestCase):
     def test_index_context_paginator(self):
         response = self.authorized_client.get(reverse('posts:index'))
         page_obj = response.context.get('page_obj')
-        self.assertEqual(len(page_obj),  POSTS_COUNT)
+        self.assertEqual(len(page_obj), POSTS_COUNT)
 
     def test_group_posts_context_paginator(self):
         group_slug = PostPagesTests.group.slug
