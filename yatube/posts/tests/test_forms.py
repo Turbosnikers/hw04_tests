@@ -1,10 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post
+from posts.models import Group, Post, User
 
-User = get_user_model()
+from http import HTTPStatus
 
 
 class PostCreateFormTests(TestCase):
@@ -67,6 +66,6 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         post.refresh_from_db()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(post.text, form_data['text'])
         self.assertEqual(post.group.id, form_data['group'])

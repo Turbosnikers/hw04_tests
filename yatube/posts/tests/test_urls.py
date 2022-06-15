@@ -1,9 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.urls import reverse
 
-from posts.models import Group, Post
+from posts.models import Group, Post, User
 
-User = get_user_model()
+from http import HTTPStatus
 
 
 class StaticURLTests(TestCase):
@@ -14,7 +14,7 @@ class StaticURLTests(TestCase):
         }
         for address in templates_url_names:
             response = self.client.get(address)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
 class PostURLTest(TestCase):
@@ -29,7 +29,7 @@ class PostURLTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый текст',
+            text='Тестовый текст поста',
             group=cls.group
         )
 
@@ -49,14 +49,15 @@ class PostURLTest(TestCase):
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_redirect_if_not_auth(self):
         response = self.client.get('/create/', follow=True)
+        path = reverse('users:login')
         self.assertRedirects(
-            response, '/auth/login/?next=/create/'
+            response, f'{path}?next=/create/',
         )
 
     def test_404_page(self):
         response = self.client.get('/wrong_url/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
